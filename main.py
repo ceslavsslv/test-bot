@@ -9,6 +9,7 @@ from aiogram.webhook.aiohttp_server import setup_application
 
 # 🔧 Load .env
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 API_TOKEN = os.getenv("API_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
@@ -21,16 +22,12 @@ PORT = int(os.getenv("PORT", 8443))
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
-logging.basicConfig(level=logging.INFO)
 
 # 📥 Router for /start and general messages
 from handlers import debug
 dp.include_router(debug.router)
 
 # ✅ 🔥 Catch-all update to avoid 404 from Telegram
-@dp.update()
-async def catch_all_updates(update: Update):
-    print("📥 Got update:", update)
 
 @dp.update()
 async def handle_all_updates(update: Update):
@@ -52,8 +49,8 @@ def main():
     app.on_startup.append(on_startup)
     app.on_shutdown.append(on_shutdown)
 
-    print(f"👉 WEBHOOK_PATH: {WEBHOOK_PATH}")
-    print(f"👉 WEBHOOK_URL_FULL: {WEBHOOK_URL_FULL}")
+    logging.info(f"👉 WEBHOOK_PATH: {WEBHOOK_PATH}")
+    logging.info(f"👉 WEBHOOK_URL_FULL: {WEBHOOK_URL_FULL}")
     setup_application(app, dp, path=WEBHOOK_PATH)
 
     web.run_app(app, host=HOST, port=PORT)
