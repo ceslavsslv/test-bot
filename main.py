@@ -1,31 +1,31 @@
-import os
+import sys
 import logging
+from os import getenv
 from aiohttp import web
-from dotenv import load_dotenv
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram import Bot, Dispatcher, Router, types, F
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+from aiogram.utils.markdown import hbold
 from aiogram.types import Update
-from aiogram.webhook.aiohttp_server import setup_application
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-# 🔧 Load .env
-load_dotenv()
-logging.basicConfig(level=logging.INFO)
-
-API_TOKEN = os.getenv("API_TOKEN")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")
-WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/webhook")
+API_TOKEN = getenv("API_TOKEN")
+WEBHOOK_URL = getenv("WEBHOOK_URL")
+WEBHOOK_PATH = getenv("WEBHOOK_PATH")
 WEBHOOK_URL_FULL = f"{WEBHOOK_URL}{WEBHOOK_PATH}"
-HOST = os.getenv("HOST", "0.0.0.0")
-PORT = int(os.getenv("PORT", 8443))
+HOST = getenv("HOST")
+PORT = int(getenv("PORT"))
 
 # 🔁 Initialize bot
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(storage=MemoryStorage())
-
+router = Router ()
+dp = Dispatcher
 
 # 📥 Router for /start and general messages
 from handlers import debug
-dp.include_router(debug.router)
+router(debug.cmd_start, debug.catch_all)
 
 # ✅ 🔥 Catch-all update to avoid 404 from Telegram
 
@@ -34,9 +34,9 @@ async def handle_all_updates(update: Update):
     print("📥 Telegram update received")
 
 # 🔄 Webhook setup
-async def on_startup(app):
+async def on_startup(bot: Bot):
     await bot.set_webhook(WEBHOOK_URL_FULL)
-    print(f"✅ Webhook set: {WEBHOOK_URL_FULL}")
+    print(f"✅ Webhook set: {WEBHOOK_URL_FULL}")    
 
 async def on_shutdown(app):
     await bot.delete_webhook()
@@ -45,15 +45,24 @@ async def on_shutdown(app):
 
 # 🚀 Start server
 def main():
+    dp = Dispatcher()
+    dp.include_router(router)
+    dp.startup.register(on_startup)
+    bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     app = web.Application()
+    webhook_requests_handler = SimpleRequestHandler(
+        dispatcher=dp,
+        bot=bot, 
+    )
+    webhook_requests_handler.register(app, path=WEBHOOK_PATH)
+    setup_application(app, dp, bot=bot)
+    web.run_app(app, host=HOST, port=PORT)
     app.on_startup.append(on_startup)
     app.on_shutdown.append(on_shutdown)
 
     logging.info(f"👉 WEBHOOK_PATH: {WEBHOOK_PATH}")
     logging.info(f"👉 WEBHOOK_URL_FULL: {WEBHOOK_URL_FULL}")
-    setup_application(app, dp, path=WEBHOOK_PATH)
-
-    web.run_app(app, host=HOST, port=PORT)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     main()
