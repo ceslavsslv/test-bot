@@ -37,10 +37,14 @@ def main():
     app = web.Application()
     app.on_startup.append(on_startup)
     app.on_shutdown.append(on_shutdown)
-    setup_application(app, dp, path=WEBHOOK_PATH)
-    web.run_app(app, host=HOST, port=PORT)
+    
     print(f"👉 WEBHOOK_PATH: {WEBHOOK_PATH}")
     print(f"👉 WEBHOOK_URL_FULL: {WEBHOOK_URL_FULL}")
+
+    setup_application(app, dp, path=WEBHOOK_PATH)
+
+    web.run_app(app, host=HOST, port=PORT)
+    
 
 
 if __name__ == "__main__":
