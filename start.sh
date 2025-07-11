@@ -41,6 +41,6 @@ fi
 
 # === Palaiž botu fonā ===
 echo "🚀 Starting bot..."
-nohup python run.py > bot.log 2>&1 &
+nohup python main.py > bot.log 2>&1 &
 echo $! > bot.pid
 echo "✅ Bot started (PID $(cat bot.pid)) – logs in bot.log"

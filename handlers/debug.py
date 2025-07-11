@@ -9,3 +9,4 @@ async def cmd_start(message: types.Message):
 @router.message()
 async def catch_all(message: types.Message):
     await message.answer("✅ Saņēmu tavu ziņu.")
+    
