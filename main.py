@@ -2,10 +2,9 @@ import sys
 import logging
 from os import getenv
 from aiohttp import web
-from aiogram import Bot, Dispatcher, Router, types, F
+from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 from aiogram.types import Update
