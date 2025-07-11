@@ -9,7 +9,7 @@ from aiogram.webhook.aiohttp_server import setup_application
 # === Ielādē .env ===
 load_dotenv()
 API_TOKEN = os.getenv("API_TOKEN")
-WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/webhook")
+WEBHOOK_PATH = os.getenv("WEBHOOK_PATH") or "/webhook"
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 WEBHOOK_URL_FULL = f"{WEBHOOK_URL}{WEBHOOK_PATH}"
 HOST = os.getenv("HOST", "0.0.0.0")
@@ -39,6 +39,9 @@ def main():
     app.on_shutdown.append(on_shutdown)
     setup_application(app, dp, path=WEBHOOK_PATH)
     web.run_app(app, host=HOST, port=PORT)
+    print(f"👉 WEBHOOK_PATH: {WEBHOOK_PATH}")
+    print(f"👉 WEBHOOK_URL_FULL: {WEBHOOK_URL_FULL}")
+
 
 if __name__ == "__main__":
     main()
