@@ -1,4 +1,5 @@
 import os
+import logging
 from aiohttp import web
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
@@ -19,6 +20,8 @@ PORT = int(os.getenv("PORT", 8443))
 # 🔁 Initialize bot
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
+
+logging.basicConfig(level=logging.INFO)
 
 # 📥 Router for /start and general messages
 from handlers import debug
