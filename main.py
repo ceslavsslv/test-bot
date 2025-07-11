@@ -32,6 +32,10 @@ dp.include_router(debug.router)
 async def catch_all_updates(update: Update):
     print("📥 Got update:", update)
 
+@dp.update()
+async def handle_all_updates(update: Update):
+    print("📥 Telegram update received")
+
 # 🔄 Webhook setup
 async def on_startup(app):
     await bot.set_webhook(WEBHOOK_URL_FULL)
