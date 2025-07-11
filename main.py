@@ -24,11 +24,11 @@ dp = Dispatcher
 
 # 📥 Router for /start and general messages
 from handlers import debug
-router(debug.cmd_start, debug.catch_all)
+debug.cmd_start
+debug.catch_all
 
 # ✅ 🔥 Catch-all update to avoid 404 from Telegram
 
-@dp.update()
 async def handle_all_updates(update: Update):
     print("📥 Telegram update received")
 
